@@ -68,7 +68,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS secret access key stored in GitHub secrets
         aws-region: us-east-1  # AWS region
 
-    - name: Deploy to AWS Sagemaker
+    - name: Deploy to AWS Sagemaker(can be deployed to Azure with necessary changes)
       run: |
         # Replace these commands with the actual deployment commands for your cloud service
         # Create a model in Sagemaker
@@ -76,4 +76,4 @@ jobs:
         # Create an endpoint configuration
         aws sagemaker create-endpoint-config --endpoint-config-name my-endpoint-config --production-variants VariantName=AllTraffic,ModelName=my-ml-model,InitialInstanceCount=1,InstanceType=ml.m5.large
         # Create an endpoint
-        aws sagemaker create-endpoint --endpoint-name my-endpoint --endpoint-config-name my-endpoint-config
+        aws sagemaker create-endpoint --endpoint-name my-endpoint --endpoint-config-name my-endpoint-configure
