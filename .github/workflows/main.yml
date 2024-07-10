@@ -33,7 +33,7 @@ jobs:
         pip install -r requirements.txt  # Install the dependencies listed in requirements.txt
 
     - name: Run data preprocessing
-      run: python scripts/data_preprocessing.py  # Execute the data preprocessing script
+      run: python scripts/data_preprocessing.py  # Execute the data preprocessing/data cleaning script
 
     - name: Run model training
       run: python scripts/train_model.py  # Execute the model training script

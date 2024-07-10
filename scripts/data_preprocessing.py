@@ -15,6 +15,7 @@ def collect_from_database(query):
 account_name = "rg_data_sci"
 client_id = "a1b2c3d4"
 
+
 dataset_from_database = collect_from_database("SELECT * FROM CLAIMS.DS_DATASET")
 
 # Data Wrangling

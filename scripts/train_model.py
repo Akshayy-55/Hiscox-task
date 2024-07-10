@@ -47,6 +47,7 @@ random_search = RandomizedSearchCV(
 random_search.fit(X_train, y_train)
 model_optimized = random_search.best_estimator_
 
+
 # Save the model
 import joblib
 joblib.dump(model_optimized, "xgboost_model_optimized.pkl")

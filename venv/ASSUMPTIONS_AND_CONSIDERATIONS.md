@@ -70,6 +70,7 @@
    - Providing detailed comments and explanations within the code.
    - Creating user guides and API documentation for end-users and stakeholders.
 
+
 ### Out of Scope
 1. **Data Pipeline Setup**:
    - Setting up the initial data pipelines and ETL processes is the responsibility of the data engineering team, but I will collaborate closely to ensure integration with the ML pipeline.

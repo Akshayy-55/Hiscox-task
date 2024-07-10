@@ -5,6 +5,7 @@ import xgboost as xgb
 import joblib
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, cohen_kappa_score
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 # Load preprocessed data
 dataset = pd.read_csv("preprocessed_data.csv")

@@ -15,7 +15,7 @@ The client secret key has been deleted as per the instructions.
   - `evaluate_model.py`: Script for model evaluation.
 - `Dockerfile`: Dockerfile for building the Docker image.
 - `requirements.txt`: File listing project dependencies.
-- `README.md`: Project documentation.
+- `README.md`: Project documentation
 - `ASSUMPTIONS_AND_CONSIDERATIONS.md`: Document detailing assumptions, business considerations, team interactions, and scope of responsibilities.
 
 
