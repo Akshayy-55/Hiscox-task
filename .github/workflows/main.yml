@@ -1,0 +1,79 @@
+# .github/workflows/main.yml
+
+# Name of the workflow
+name: CI/CD Pipeline
+
+# Trigger the workflow on push or pull request events to the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Define the jobs that will run as part of the workflow
+jobs:
+  # The build job will handle installing dependencies, preprocessing data, training the model, evaluating it, and building/pushing the Docker image
+  build:
+    runs-on: ubuntu-latest  # The job will run on the latest version of an Ubuntu runner
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Action to check out the repository
+
+    - name: Set up Python
+      uses: actions/setup-python@v2  # Action to set up Python
+      with:
+        python-version: 3.8  # Specify the Python version to use
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip  # Upgrade pip
+        pip install -r requirements.txt  # Install the dependencies listed in requirements.txt
+
+    - name: Run data preprocessing
+      run: python scripts/data_preprocessing.py  # Execute the data preprocessing script
+
+    - name: Run model training
+      run: python scripts/train_model.py  # Execute the model training script
+
+    - name: Run model evaluation
+      run: python scripts/evaluate_model.py  # Execute the model evaluation script
+
+    - name: Build Docker image
+      run: docker build . -t my-ml-model:latest  # Build the Docker image
+
+    - name: Log in to Docker Hub
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin  # Log in to Docker Hub using credentials stored in GitHub secrets
+
+    - name: Push Docker image to registry
+      run: |
+        docker tag my-ml-model:latest my-docker-repo/my-ml-model:latest  # Tag the Docker image
+        docker push my-docker-repo/my-ml-model:latest  # Push the Docker image to Docker Hub
+
+  # The deploy job will handle deploying the model to a cloud service (e.g., AWS Sagemaker)
+  deploy:
+    runs-on: ubuntu-latest  # The job will run on the latest version of an Ubuntu runner
+    needs: build  # This job will only run if the build job completes successfully
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Action to check out the repository
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1  # Action to configure AWS credentials
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS access key ID stored in GitHub secrets
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS secret access key stored in GitHub secrets
+        aws-region: us-east-1  # AWS region
+
+    - name: Deploy to AWS Sagemaker
+      run: |
+        # Replace these commands with the actual deployment commands for your cloud service
+        # Create a model in Sagemaker
+        aws sagemaker create-model --model-name my-ml-model --primary-container Image=my-docker-repo/my-ml-model:latest,ModelDataUrl=s3://your-bucket/path/to/model
+        # Create an endpoint configuration
+        aws sagemaker create-endpoint-config --endpoint-config-name my-endpoint-config --production-variants VariantName=AllTraffic,ModelName=my-ml-model,InitialInstanceCount=1,InstanceType=ml.m5.large
+        # Create an endpoint
+        aws sagemaker create-endpoint --endpoint-name my-endpoint --endpoint-config-name my-endpoint-config
