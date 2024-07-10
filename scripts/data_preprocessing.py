@@ -14,7 +14,6 @@ def collect_from_database(query):
 # Data Collection
 account_name = "rg_data_sci"
 client_id = "a1b2c3d4"
-client_secret = "b1c2d3e4" # Delete before committing
 
 dataset_from_database = collect_from_database("SELECT * FROM CLAIMS.DS_DATASET")
 
