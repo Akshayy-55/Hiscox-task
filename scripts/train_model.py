@@ -1,53 +1,71 @@
-# train_model.py
-
 import pandas as pd
 import xgboost as xgb
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.metrics import make_scorer, f1_score
-
-# Load preprocessed data
-dataset = pd.read_csv("preprocessed_data.csv")
-
-# Separate the DataFrame into labels and features
-X = dataset.drop('claim_status', axis=1)
-y = dataset['claim_status']
-
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Initial Model Training
-model = xgb.XGBClassifier(
-    objective='binary:logistic',
-    eval_metric='logloss',
-    use_label_encoder=False
-)
-
-model.fit(X_train, y_train)
-
-# Cross Validation
-param_dist = {
-    'n_estimators': range(50, 400, 50),
-    'learning_rate': [0.01, 0.05, 0.1, 0.3],
-    'max_depth': range(3, 10, 2),
-    'min_child_weight': [1, 3, 5, 7],
-    'subsample': [0.6, 0.8, 1.0],
-    'colsample_bytree': [0.6, 0.8, 1.0]
-}
-
-random_search = RandomizedSearchCV(
-    estimator=xgb.XGBClassifier(objective='binary:logistic', eval_metric='logloss', use_label_encoder=False),
-    param_distributions=param_dist,
-    scoring=make_scorer(f1_score),
-    n_iter=50,
-    cv=3,
-    verbose=1,
-    random_state=42
-)
-
-random_search.fit(X_train, y_train)
-model_optimized = random_search.best_estimator_
-
-
-# Save the model
+from sklearn.model_selection import train_test_split
 import joblib
-joblib.dump(model_optimized, "xgboost_model_optimized.pkl")
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+def load_data(file_path):
+    """
+    Load preprocessed data from a CSV file.
+
+    Args:
+    file_path (str): Path to the preprocessed data file.
+
+    Returns:
+    pd.DataFrame: DataFrame containing the preprocessed data.
+    """
+    try:
+        logging.info(f"Loading data from {file_path}")
+        data = pd.read_csv(file_path)
+        return data
+    except Exception as e:
+        logging.error(f"Error loading data: {e}")
+        raise
+
+
+def train_model(X, y):
+    """
+    Train an XGBoost model using the provided features and labels.
+
+    Args:
+    X (pd.DataFrame): Features for training.
+    y (pd.Series): Labels for training.
+
+    Returns:
+    model: Trained XGBoost model.
+    """
+    logging.info("Training model")
+    model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+    model.fit(X, y)
+    return model
+
+
+def save_model(model, model_path):
+    """
+    Save the trained model to a file.
+
+    Args:
+    model: Trained model.
+    model_path (str): Path to save the model.
+    """
+    joblib.dump(model, model_path)
+    logging.info(f"Model saved to {model_path}")
+
+
+if __name__ == "__main__":
+    data_path = "preprocessed_data.csv"
+    model_path = "xgboost_model_optimized.pkl"
+
+    dataset = load_data(data_path)
+
+    X = dataset.drop('claim_status', axis=1)
+    y = dataset['claim_status']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = train_model(X_train, y_train)
+    save_model(model, model_path)
